@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<xsl:stylesheet version="1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="mods"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns:srw_dc="info:srw/schema/1/dc-schema"
@@ -88,6 +88,7 @@
 			<xsl:if test="@type='alternative'">
 				<xsl:text>Alternative Title: </xsl:text>
 			<xsl:value-of select="mods:nonSort"/>
+			</xsl:if>
 			<xsl:if test="mods:nonSort">
 				<xsl:text> </xsl:text>
 			</xsl:if>
@@ -188,7 +189,7 @@
 	<!-- Notes -->
 	<xsl:template match="mods:abstract | mods:tableOfContents | mods:note">
 		<dc:description>
-			<xsl:if test="mods:note[@type='preferredCitation']">
+			<xsl:if test="@type='preferredCitation'">
 				<xsl:text>Preferred Citation: </xsl:text>
 			</xsl:if>
 			<xsl:value-of select="."/>
@@ -197,15 +198,7 @@
 
 	<!-- Dates & Publisher -->
 	<xsl:template match="mods:originInfo">
-		<xsl:apply-templates select="*[@point='start']"/>
-		<xsl:for-each
-			select="mods:dateIssued[@point!='start' and @point!='end'] | mods:dateCreated[@point!='start' and @point!='end'] | mods:dateCaptured[@point!='start' and @point!='end'] | mods:dateOther[@point!='start' and @point!='end']">
-			<dc:date>
-				<xsl:value-of select="."/>
-			</dc:date>
-		</xsl:for-each>
 		<xsl:apply-templates select="*[not(@point)]"/> 
-		
 		<xsl:for-each select="mods:publisher">
 			<dc:publisher>
 				<xsl:value-of select="."/>
@@ -213,29 +206,12 @@
 		</xsl:for-each>
 	</xsl:template>
 	
-	<xsl:template match="mods:dateIssued | mods:dateCreated | mods:dateCaptured">
+	<xsl:template match="mods:dateIssued | mods:dateCreated">
 		<dc:date>
-			<xsl:choose>
-				<xsl:when test="@point='start'">
-					<xsl:value-of select="."/>
-				</xsl:when>
-				<xsl:when test="@point='end'">
-					<xsl:text>-</xsl:text>
-					<xsl:value-of select="."/>
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="."/>
-				</xsl:otherwise>
-			</xsl:choose>
+			<xsl:if test="not(@*)">
+				<xsl:value-of select="."/>
+			</xsl:if>
 		</dc:date>
-	</xsl:template>
-	
-	<xsl:template match="mods:temporal[@point='start']  ">
-		<xsl:value-of select="."/>-<xsl:value-of select="../mods:temporal[@point='end']"/>
-	</xsl:template>
-	
-	<xsl:template match="mods:temporal[@point!='start' and @point!='end']  ">
-		<xsl:value-of select="."/>
 	</xsl:template>
 
 	<!-- Type/Genre -->
@@ -356,7 +332,6 @@
 		<xsl:variable name="name">
 			<xsl:for-each select="mods:namePart[not(@type)]">
 				<xsl:value-of select="."/>
-				<xsl:text> </xsl:text>
 			</xsl:for-each>
 			<xsl:value-of select="mods:namePart[@type='family']"/>
 			<xsl:if test="mods:namePart[@type='given']">
@@ -373,11 +348,6 @@
 				<xsl:value-of select="mods:displayForm"/>
 				<xsl:text>) </xsl:text>
 			</xsl:if>
-			<xsl:for-each select="mods:role[mods:roleTerm[@type='text']!='creator']">
-				<xsl:text> (</xsl:text>
-				<xsl:value-of select="normalize-space(child::*)"/>
-				<xsl:text>) </xsl:text>
-			</xsl:for-each>
 		</xsl:variable>
 		<xsl:value-of select="normalize-space($name)"/>
 	</xsl:template>
