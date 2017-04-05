@@ -170,6 +170,17 @@
           </xsl:if>
         </xsl:for-each>
       </field>
+
+      <!-- custom SOLR field for ALL names, regardless of @type or role/roleTerm -->
+      <field>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat($prefix, 'all_names', $suffix)"/>
+        </xsl:attribute>
+        <xsl:for-each select="mods:namePart[not(@type='date')]">
+          <xsl:value-of select="text()"/>
+        </xsl:for-each>
+      </field>
+
     </xsl:for-each>
 
     <xsl:for-each select="mods:name/mods:description[normalize-space(text())]">
