@@ -202,6 +202,10 @@
 		<xsl:for-each select="mods:publisher">
 			<dc:publisher>
 				<xsl:value-of select="."/>
+				<xsl:if test="../mods:place">
+					<xsl:text>, </xsl:text>
+					<xsl:value-of select="../mods:place"/>
+				</xsl:if>
 			</dc:publisher>
 		</xsl:for-each>
 	</xsl:template>
