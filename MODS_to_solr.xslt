@@ -171,7 +171,7 @@
         </xsl:for-each>
       </field>
 
-      <!-- custom SOLR field for ALL names, regardless of @type or role/roleTerm -->
+      <!-- CHS custom SOLR field for ALL names, regardless of @type or role/roleTerm -->
       <field>
         <xsl:attribute name="name">
           <xsl:value-of select="concat($prefix, 'all_names', $suffix)"/>

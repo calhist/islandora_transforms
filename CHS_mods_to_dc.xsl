@@ -4,7 +4,8 @@
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns:srw_dc="info:srw/schema/1/dc-schema"
 	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns:xlink="http://www.w3.org/1999/xlink">
 
 <!-- 
 	2017-03-29		Customizations for CHS by Bill Levay:
@@ -133,7 +134,6 @@
 
 	<xsl:template match="mods:location/mods:shelfLocator | mods:identifier[@type='local']">
 		<dc:identifier>
-			<xsl:text>local: </xsl:text>
 			<xsl:value-of select="."/>
 		</dc:identifier>
 	</xsl:template>
@@ -327,7 +327,12 @@
 	<!-- Rights -->
 	<xsl:template match="mods:accessCondition">
 		<dc:rights>
-			<xsl:value-of select="."/>
+			<xsl:if test="@xlink:href">
+				<xsl:value-of select="@xlink:href"/>
+			</xsl:if>
+			<xsl:if test="not(@xlink:href)">
+				<xsl:value-of select="."/>
+			</xsl:if>
 		</dc:rights>
 	</xsl:template>
 
