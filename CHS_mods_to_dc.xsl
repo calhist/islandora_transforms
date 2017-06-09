@@ -3,6 +3,7 @@
 	xmlns:mods="http://www.loc.gov/mods/v3" exclude-result-prefixes="mods"
 	xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dcterms="http://purl.org/dc/terms/"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns:xlink="http://www.w3.org/1999/xlink">
 
@@ -18,28 +19,32 @@
 	
 	<!-- Title -->
 	<xsl:template match="mods:titleInfo">
-		<dc:title>
-			<xsl:if test="@type='alternative'">
-				<xsl:text>Alternative Title: </xsl:text>
-			<xsl:value-of select="mods:nonSort"/>
-			</xsl:if>
-			<xsl:if test="mods:nonSort">
-				<xsl:text> </xsl:text>
-			</xsl:if>
-			<xsl:value-of select="mods:title"/>
-			<xsl:if test="mods:subTitle">
-				<xsl:text>: </xsl:text>
-				<xsl:value-of select="mods:subTitle"/>
-			</xsl:if>
-			<xsl:if test="mods:partNumber">
-				<xsl:text>. </xsl:text>
-				<xsl:value-of select="mods:partNumber"/>
-			</xsl:if>
-			<xsl:if test="mods:partName">
-				<xsl:text>. </xsl:text>
-				<xsl:value-of select="mods:partName"/>
-			</xsl:if>
-		</dc:title>
+		<xsl:if test="not(@type)">
+			<dc:title>
+				<xsl:if test="mods:nonSort">
+					<xsl:value-of select="mods:nonSort"/>
+					<xsl:text> </xsl:text>
+				</xsl:if>
+				<xsl:value-of select="mods:title"/>
+				<xsl:if test="mods:subTitle">
+					<xsl:text>: </xsl:text>
+					<xsl:value-of select="mods:subTitle"/>
+				</xsl:if>
+			</dc:title>
+		</xsl:if>
+		<xsl:if test="@type='alternative'">
+			<dcterms:alternative>
+				<xsl:if test="mods:nonSort">
+					<xsl:value-of select="mods:nonSort"/>
+					<xsl:text> </xsl:text>
+				</xsl:if>
+				<xsl:value-of select="mods:title"/>
+				<xsl:if test="mods:subTitle">
+					<xsl:text>: </xsl:text>
+					<xsl:value-of select="mods:subTitle"/>
+				</xsl:if>
+			</dcterms:alternative>
+		</xsl:if>
 	</xsl:template>
 
 	<!-- Creator and Contributor -->
@@ -106,7 +111,6 @@
 			<dc:coverage>
 				<xsl:for-each select="mods:temporal">
 					<xsl:value-of select="."/>
-					<xsl:if test="position()!=last()">-</xsl:if>
 				</xsl:for-each>
 			</dc:coverage>
 		</xsl:if>
@@ -156,22 +160,6 @@
 	</xsl:template>
 
 	<!-- Type/Genre -->
-	<xsl:template match="mods:genre">
-		<xsl:choose>
-			<xsl:when test="@authority='dct'">
-				<dc:type>
-					<xsl:value-of select="."/>
-				</dc:type>
-			</xsl:when>
-			<xsl:otherwise>
-				<dc:type>
-					<xsl:value-of select="."/>
-				</dc:type>
-				<xsl:apply-templates select="mods:typeOfResource"/>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:template>
-
 	<xsl:template match="mods:typeOfResource">
 		<xsl:if test="@collection='yes'">
 			<dc:type>Collection</dc:type>
@@ -220,6 +208,12 @@
 		</xsl:for-each>
 	</xsl:template>
 
+	<xsl:template match="mods:genre">
+		<dc:format>
+			<xsl:value-of select="."/>
+		</dc:format>
+	</xsl:template>
+
 	<!-- Related Item, Parent Collection -->
 	<xsl:template match="mods:mods/mods:relatedItem[mods:titleInfo | mods:name | mods:identifier | mods:location]">
 		<xsl:choose>
@@ -253,6 +247,8 @@
 	<xsl:template match="mods:accessCondition">
 		<dc:rights>
 			<xsl:if test="@xlink:href">
+				<xsl:value-of select="."/>
+				<xsl:text>: </xsl:text>
 				<xsl:value-of select="@xlink:href"/>
 			</xsl:if>
 			<xsl:if test="not(@xlink:href)">
