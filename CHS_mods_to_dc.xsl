@@ -117,11 +117,8 @@
 	</xsl:template>
 
 	<!-- Notes -->
-	<xsl:template match="mods:abstract | mods:tableOfContents | mods:note">
+	<xsl:template match="mods:abstract | mods:note[not(@type='preferredCitation')]">
 		<dc:description>
-			<xsl:if test="@type='preferredCitation'">
-				<xsl:text>Preferred Citation: </xsl:text>
-			</xsl:if>
 			<xsl:if test="@type='ownership'">
 				<xsl:text>Ownership: </xsl:text>
 			</xsl:if>
@@ -144,18 +141,11 @@
 		</xsl:if>
 
 		<xsl:for-each select="mods:dateIssued | mods:dateCreated">
-			<dc:date>
-				<xsl:if test="@point='start'">
+			<xsl:if test="not(@encoding='w3cdtf')">
+				<dc:date>
 					<xsl:value-of select="."/>
-					<xsl:text> - </xsl:text>
-				</xsl:if>
-				<xsl:if test="@point='end'">
-					<xsl:value-of select="."/>
-				</xsl:if>
-				<xsl:if test="not(@point)">
-					<xsl:value-of select="."/>
-				</xsl:if>
-			</dc:date>
+				</dc:date>
+			</xsl:if>
 		</xsl:for-each>
 	</xsl:template>
 
