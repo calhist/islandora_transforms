@@ -5,6 +5,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:foxml="info:fedora/fedora-system:def/foxml#"
   xmlns:mods="http://www.loc.gov/mods/v3"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
      exclude-result-prefixes="mods java">
   <!-- <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/config/index/FgsIndex/islandora_transforms/library/xslt-date-template.xslt"/>-->
   <xsl:include href="/usr/local/fedora/tomcat/webapps/fedoragsearch/WEB-INF/classes/fgsconfigFinal/index/FgsIndex/islandora_transforms/library/xslt-date-template.xslt"/>
@@ -321,6 +322,68 @@
           <xsl:value-of select="concat($prefix, 'authorityURI_', $suffix)"/>
         </xsl:attribute>
         <xsl:value-of select="$node/@authorityURI"/>
+      </field>
+    </xsl:if>
+    <xsl:if test="normalize-space($node/@valueURI)">
+      <field>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat($prefix, 'valueURI_', $suffix)"/>
+        </xsl:attribute>
+        <xsl:value-of select="$node/@valueURI"/>
+      </field>
+    </xsl:if>
+    <xsl:if test="normalize-space($node/@xlink:href)">
+      <field>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat($prefix, 'xlinkhref_', $suffix)"/>
+        </xsl:attribute>
+        <xsl:value-of select="$node/@xlink:href"/>
+      </field>
+    </xsl:if>
+    <xsl:if test="normalize-space($node/@displayLabel)">
+      <field>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat($prefix, 'displayLabel_', $suffix)"/>
+        </xsl:attribute>
+        <xsl:value-of select="$node/@displayLabel"/>
+      </field>
+    </xsl:if>
+
+    <!-- CHS edit to concatenate names with dates across ALL types and roles -->
+    <xsl:if test="$node/mods:namePart">
+      <field>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat('chs_', $prefix, 'all_names_', $suffix)"/>
+        </xsl:attribute>
+        <xsl:value-of select="$node/mods:namePart[not(@type)]">
+        <xsl:if test="$node/mods:namePart[@type='date']">
+          <xsl:text>, </xsl:text>
+          <xsl:value-of select="$node/mods:namePart[@type='date']"/>
+        </xsl:if>
+      </field>
+    </xsl:if>
+
+    <!-- CHS edit to concatenate names with dates for Creators & Contributors across all types-->
+    <xsl:if test="$node/mods:name[mods:namePart and mods:role]">
+      <xsl:choose>
+        <xsl:when test="$node/mods:roleTerm[@type='text']='Creator'">
+          <xsl:variable name="role" select="'creator'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="role" select="'contributor'"/>\
+        </xsl:otherwise>
+      </xsl:choose>
+      <field>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat('chs_', $prefix, 'name_', $role, $suffix)"/>
+        </xsl:attribute>
+        <xsl:for-each select="$node/mods:namePart[not(@type)]">
+          <xsl:value-of select="text()"/>
+        </xsl:for-each>
+        <xsl:if test="$node/mods:namePart[@type='date']">
+          <xsl:text>, </xsl:text>
+          <xsl:value-of select="$node/mods:namePart[@type='date']"/>
+        </xsl:if>
       </field>
     </xsl:if>
 
