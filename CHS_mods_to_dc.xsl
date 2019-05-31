@@ -50,7 +50,7 @@
 	<!-- Creator and Contributor -->
 	<xsl:template match="mods:name">
 		<xsl:choose>
-			<xsl:when test="mods:role/mods:roleTerm[@type='text']='Creator'">
+			<xsl:when test="mods:role/mods:roleTerm[@type='text']='Creator'or mods:role/mods:roleTerm[@type='text']='creator'">
 				<dc:creator>
 					<xsl:call-template name="name"/>
 				</dc:creator>
